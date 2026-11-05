@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { GifItem } from '../types/gif';
-import { Heart, Copy, Download, Check, Sparkles, Sticker } from 'lucide-react';
+import { Heart, Copy, Download, Check, Sparkles, Sticker, Loader2 } from 'lucide-react';
 import {
   shareAsWhatsAppSticker,
   shareAsSignalSticker,
@@ -16,6 +16,7 @@ interface GifCardProps {
   onSelect: (gif: GifItem) => void;
   onShowQr: (gif: GifItem) => void;
   onShowToast: (message: string) => void;
+  onOpenDesktopModal?: (gif: GifItem, targetApp: 'whatsapp' | 'signal') => void;
 }
 
 export const GifCard: React.FC<GifCardProps> = ({
@@ -24,7 +25,8 @@ export const GifCard: React.FC<GifCardProps> = ({
   isStickerMode = true,
   onToggleFavorite,
   onSelect,
-  onShowToast
+  onShowToast,
+  onOpenDesktopModal
 }) => {
   const [imageError, setImageError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -33,35 +35,43 @@ export const GifCard: React.FC<GifCardProps> = ({
   const handleWhatsAppSticker = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsSharing(true);
-    await shareAsWhatsAppSticker(gif, onShowToast);
+    await shareAsWhatsAppSticker(
+      gif,
+      onShowToast,
+      onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'whatsapp') : undefined
+    );
     setIsSharing(false);
   };
 
   const handleSignalSticker = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsSharing(true);
-    await shareAsSignalSticker(gif, onShowToast);
+    await shareAsSignalSticker(
+      gif,
+      onShowToast,
+      onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'signal') : undefined
+    );
     setIsSharing(false);
   };
 
   const handleCopySticker = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    onShowToast('Preparing sticker for clipboard...');
+    onShowToast('Copying sticker image to clipboard...');
     const result = await copyStickerToClipboard(gif.url);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2200);
 
-    if (result.type === 'image') {
-      onShowToast('Sticker copied! Press Ctrl+V in WhatsApp Web or Signal chat.');
+    if (result.success) {
+      onShowToast('Sticker image copied! Press Ctrl+V in WhatsApp or Signal to paste.');
     } else {
-      onShowToast('Sticker link copied to clipboard!');
+      onShowToast('Could not copy image. Try WhatsApp or Download button.');
     }
   };
 
   const handleDownloadSticker = (e: React.MouseEvent) => {
     e.stopPropagation();
     downloadWebpSticker(gif);
-    onShowToast('Downloaded 512x512 .webp Sticker!');
+    onShowToast('Downloading .webp sticker...');
   };
 
   const handleFavorite = (e: React.MouseEvent) => {
@@ -134,12 +144,16 @@ export const GifCard: React.FC<GifCardProps> = ({
         <button
           onClick={handleWhatsAppSticker}
           disabled={isSharing}
-          title="Share as WhatsApp Sticker (.webp)"
-          className="flex-1 min-w-0 flex items-center justify-center gap-1 py-1.5 px-1 sm:px-2 rounded-lg bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-[10px] sm:text-xs font-bold shadow-2xs transition-all"
+          title="Send sticker directly to WhatsApp"
+          className="flex-1 min-w-0 flex items-center justify-center gap-1 py-1.5 px-1 sm:px-2 rounded-lg bg-[#25D366] hover:bg-[#20ba59] active:scale-95 text-white text-[10px] sm:text-xs font-bold shadow-2xs transition-all disabled:opacity-50"
         >
-          <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
+          {isSharing ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          )}
           <span className="truncate">WA Sticker</span>
         </button>
 
@@ -147,28 +161,32 @@ export const GifCard: React.FC<GifCardProps> = ({
         <button
           onClick={handleSignalSticker}
           disabled={isSharing}
-          title="Share as Signal Sticker (.webp)"
-          className="flex-1 min-w-0 flex items-center justify-center gap-1 py-1.5 px-1 sm:px-2 rounded-lg bg-[#3A76F0] hover:bg-[#2b65da] active:scale-95 text-white text-[10px] sm:text-xs font-bold shadow-2xs transition-all"
+          title="Send sticker directly to Signal"
+          className="flex-1 min-w-0 flex items-center justify-center gap-1 py-1.5 px-1 sm:px-2 rounded-lg bg-[#3A76F0] hover:bg-[#2b65da] active:scale-95 text-white text-[10px] sm:text-xs font-bold shadow-2xs transition-all disabled:opacity-50"
         >
-          <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.95.56 3.77 1.53 5.32L2 22l4.82-1.51C8.32 21.45 10.1 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z"/>
-          </svg>
+          {isSharing ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <svg className="w-3.5 h-3.5 shrink-0 fill-current" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12c0 1.95.56 3.77 1.53 5.32L2 22l4.82-1.51C8.32 21.45 10.1 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm1 14.5h-2v-2h2v2zm0-4h-2V7h2v5.5z"/>
+            </svg>
+          )}
           <span className="truncate">Signal</span>
         </button>
 
-        {/* Copy Sticker to Clipboard */}
+        {/* Copy Sticker Image */}
         <button
           onClick={handleCopySticker}
-          title="Copy Sticker to clipboard (Ctrl+V in WhatsApp Web / Signal)"
+          title="Copy Sticker image to clipboard (Ctrl+V in WhatsApp Web / Signal)"
           className="p-1.5 sm:p-2 shrink-0 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 active:scale-95 transition-all"
         >
           {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
         </button>
 
-        {/* Download .webp Sticker file */}
+        {/* Download Sticker File */}
         <button
           onClick={handleDownloadSticker}
-          title="Download .webp Sticker file (512x512)"
+          title="Download sticker (.webp)"
           className="p-1.5 sm:p-2 shrink-0 rounded-lg bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 active:scale-95 transition-all"
         >
           <Download className="w-3.5 h-3.5" />

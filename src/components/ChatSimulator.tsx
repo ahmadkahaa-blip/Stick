@@ -1,24 +1,40 @@
 import React, { useState } from 'react';
 import { GifItem } from '../types/gif';
-import { CheckCheck, Lock, Send, Smartphone, Sticker } from 'lucide-react';
+import { CheckCheck, Lock, Smartphone, Sticker, Loader2 } from 'lucide-react';
 import { shareAsWhatsAppSticker, shareAsSignalSticker } from '../utils/shareUtils';
 
 interface ChatSimulatorProps {
   gif: GifItem;
   onShowToast: (msg: string) => void;
+  onOpenDesktopModal?: (gif: GifItem, targetApp: 'whatsapp' | 'signal') => void;
 }
 
-export const ChatSimulator: React.FC<ChatSimulatorProps> = ({ gif, onShowToast }) => {
+export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
+  gif,
+  onShowToast,
+  onOpenDesktopModal
+}) => {
   const [activePlatform, setActivePlatform] = useState<'whatsapp' | 'signal'>('whatsapp');
   const [customNote, setCustomNote] = useState('');
+  const [isSending, setIsSending] = useState(false);
   const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const handleSend = async () => {
+    setIsSending(true);
     if (activePlatform === 'whatsapp') {
-      await shareAsWhatsAppSticker(gif, onShowToast);
+      await shareAsWhatsAppSticker(
+        gif,
+        onShowToast,
+        onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'whatsapp') : undefined
+      );
     } else {
-      await shareAsSignalSticker(gif, onShowToast);
+      await shareAsSignalSticker(
+        gif,
+        onShowToast,
+        onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'signal') : undefined
+      );
     }
+    setIsSending(false);
   };
 
   return (
@@ -74,8 +90,8 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({ gif, onShowToast }
           <Lock className="w-3 h-3 text-amber-400 shrink-0" />
           <span>
             {activePlatform === 'whatsapp'
-              ? 'Sticker sent as native .webp sticker'
-              : 'Sticker sent via Signal chat'}
+              ? 'Sends as true WhatsApp .webp sticker'
+              : 'Sends as true Signal sticker'}
           </span>
         </div>
 
@@ -120,13 +136,18 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({ gif, onShowToast }
 
         <button
           onClick={handleSend}
-          className={`flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white rounded-lg transition-colors whitespace-nowrap shadow-xs active:scale-95 ${
+          disabled={isSending}
+          className={`flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white rounded-lg transition-colors whitespace-nowrap shadow-xs active:scale-95 disabled:opacity-50 ${
             activePlatform === 'whatsapp'
               ? 'bg-[#25D366] hover:bg-[#20ba59]'
               : 'bg-[#3A76F0] hover:bg-[#2b65da]'
           }`}
         >
-          <Sticker className="w-3.5 h-3.5" />
+          {isSending ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Sticker className="w-3.5 h-3.5" />
+          )}
           <span>Send as {activePlatform === 'whatsapp' ? 'WhatsApp' : 'Signal'} Sticker</span>
         </button>
       </div>

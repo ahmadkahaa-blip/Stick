@@ -7,6 +7,7 @@ import { GifDetailModal } from './components/GifDetailModal';
 import { QrModal } from './components/QrModal';
 import { Toast } from './components/Toast';
 import { AiCategoryModal } from './components/AiCategoryModal';
+import { DesktopStickerModal } from './components/DesktopStickerModal';
 import { Heart, Sparkles, Trash2, Sticker, CheckCircle2 } from 'lucide-react';
 
 const STORAGE_FAVORITES = 'bobble_favs_v3';
@@ -50,7 +51,7 @@ export default function App() {
   const toggleTheme = () => setIsDark((prev) => !prev);
 
   // Sticker format mode (enabled by default)
-  const [isStickerMode, setIsStickerMode] = useState<boolean>(true);
+  const [isStickerMode] = useState<boolean>(true);
 
   // Favorites state
   const [favorites, setFavorites] = useState<string[]>(() => {
@@ -109,8 +110,27 @@ export default function App() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Desktop Sticker Helper Modal state
+  const [desktopModalData, setDesktopModalData] = useState<{
+    isOpen: boolean;
+    gif: GifItem | null;
+    targetApp: 'whatsapp' | 'signal';
+  }>({
+    isOpen: false,
+    gif: null,
+    targetApp: 'whatsapp'
+  });
+
   const showToast = (msg: string) => {
     setToastMessage(msg);
+  };
+
+  const handleOpenDesktopModal = (gif: GifItem, targetApp: 'whatsapp' | 'signal') => {
+    setDesktopModalData({
+      isOpen: true,
+      gif,
+      targetApp
+    });
   };
 
   const handleToggleFavorite = (id: string) => {
@@ -293,6 +313,7 @@ export default function App() {
                 onSelect={(g) => setSelectedGif(g)}
                 onShowQr={(g) => setQrGif(g)}
                 onShowToast={showToast}
+                onOpenDesktopModal={handleOpenDesktopModal}
               />
             ))}
           </div>
@@ -336,8 +357,17 @@ export default function App() {
           onSelectGif={(g) => setSelectedGif(g)}
           onShowQr={(g) => setQrGif(g)}
           onShowToast={showToast}
+          onOpenDesktopModal={handleOpenDesktopModal}
         />
       )}
+
+      {/* Desktop Helper Modal for 1-click paste into WhatsApp Web & Signal */}
+      <DesktopStickerModal
+        isOpen={desktopModalData.isOpen}
+        onClose={() => setDesktopModalData((prev) => ({ ...prev, isOpen: false }))}
+        gif={desktopModalData.gif}
+        targetApp={desktopModalData.targetApp}
+      />
 
       {/* QR Code Modal for Mobile Phone Camera Sharing */}
       {qrGif && (

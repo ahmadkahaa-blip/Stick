@@ -19,6 +19,7 @@ interface GifDetailModalProps {
   onShowQr: (gif: GifItem) => void;
   onShowToast: (msg: string) => void;
   onDelete?: (id: string) => void;
+  onOpenDesktopModal?: (gif: GifItem, targetApp: 'whatsapp' | 'signal') => void;
 }
 
 export const GifDetailModal: React.FC<GifDetailModalProps> = ({
@@ -29,20 +30,29 @@ export const GifDetailModal: React.FC<GifDetailModalProps> = ({
   onToggleFavorite,
   onSelectGif,
   onShowToast,
-  onDelete
+  onDelete,
+  onOpenDesktopModal
 }) => {
   const [copiedSticker, setCopiedSticker] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
 
   const handleWhatsAppSticker = async () => {
     setIsSharing(true);
-    await shareAsWhatsAppSticker(gif, onShowToast);
+    await shareAsWhatsAppSticker(
+      gif,
+      onShowToast,
+      onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'whatsapp') : undefined
+    );
     setIsSharing(false);
   };
 
   const handleSignalSticker = async () => {
     setIsSharing(true);
-    await shareAsSignalSticker(gif, onShowToast);
+    await shareAsSignalSticker(
+      gif,
+      onShowToast,
+      onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'signal') : undefined
+    );
     setIsSharing(false);
   };
 
@@ -222,7 +232,11 @@ export const GifDetailModal: React.FC<GifDetailModalProps> = ({
                 <MessageSquare className="w-4 h-4 text-amber-500" />
                 <span>Live WhatsApp Sticker Preview</span>
               </div>
-              <ChatSimulator gif={gif} onShowToast={onShowToast} />
+              <ChatSimulator
+                gif={gif}
+                onShowToast={onShowToast}
+                onOpenDesktopModal={onOpenDesktopModal}
+              />
             </div>
 
             {/* Related Stickers */}
