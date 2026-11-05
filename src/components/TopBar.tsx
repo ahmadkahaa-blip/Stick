@@ -40,7 +40,7 @@ export const TopBar: React.FC<TopBarProps> = ({
                 B
               </div>
               <span className="text-base sm:text-lg font-bold tracking-tight text-slate-900 dark:text-white whitespace-nowrap font-['Outfit']">
-                Bobble<span className="text-amber-500">Stickers</span>
+                Bobble<span className="text-amber-500">GIFs</span>
               </span>
             </button>
           </div>

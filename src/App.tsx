@@ -8,7 +8,7 @@ import { QrModal } from './components/QrModal';
 import { Toast } from './components/Toast';
 import { AiCategoryModal } from './components/AiCategoryModal';
 import { DesktopStickerModal } from './components/DesktopStickerModal';
-import { Heart, Sparkles, Trash2, Sticker, CheckCircle2 } from 'lucide-react';
+import { Heart, Sparkles, Trash2, Film, CheckCircle2 } from 'lucide-react';
 
 const STORAGE_FAVORITES = 'bobble_favs_v3';
 const STORAGE_THEME = 'bobble_theme_v3';
@@ -319,20 +319,20 @@ export default function App() {
           </div>
         ) : (
           <div className="py-20 text-center max-w-sm mx-auto">
-            <Sticker className="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
+            <Film className="w-10 h-10 text-slate-300 dark:text-slate-700 mx-auto mb-3" />
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-              No Stickers Found
+              No GIFs Found
             </h3>
             <p className="mt-1 text-xs text-slate-500">
               {activeCategory === 'favorites'
-                ? 'Click the heart icon on any sticker to save it here for quick sharing.'
-                : 'No stickers match this category yet.'}
+                ? 'Click the heart icon on any GIF to save it here for quick sharing.'
+                : 'No GIFs match this category yet.'}
             </p>
             <button
               onClick={() => setActiveCategory('all')}
               className="mt-4 px-4 py-2 text-xs font-semibold text-white bg-slate-900 dark:bg-white dark:text-slate-950 rounded-lg shadow-xs hover:opacity-90 transition-opacity"
             >
-              View All Stickers
+              View All GIFs
             </button>
           </div>
         )}

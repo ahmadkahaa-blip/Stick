@@ -34,6 +34,23 @@ export const LANGUAGES = [
 ] as const;
 
 export const INITIAL_GIFS: GifItem[] = [
+  // ================= NEW FEATURED BOBBLE STICKER =================
+  {
+    id: 'bobble-custom-wifi-band',
+    title: 'Wifi Band Kr Do',
+    category: 'Generic',
+    dialogue: 'Wifi band kr do! Padhai likhai pe dhyan do 🚫📶😂',
+    tags: ['wifi', 'wifi band kr do', 'funny', 'meme', 'desi', 'study', 'bobble', 'offline', 'internet'],
+    url: '/assets/aistudio/image_9f098507.gif',
+    language: 'Hinglish',
+    mood: 'Funny',
+    source: 'bobble.ai/custom',
+    views: 145000,
+    likes: 12800,
+    aspectRatio: 'square',
+    createdAt: '2026-11-05T00:00:00.000Z'
+  },
+
   // ================= GOOD MORNING GIFS (14) =================
   {
     id: 'bobble-gm-1',

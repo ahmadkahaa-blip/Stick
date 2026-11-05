@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GifItem } from '../types/gif';
-import { CheckCheck, Lock, Smartphone, Sticker, Loader2 } from 'lucide-react';
-import { shareAsWhatsAppSticker, shareAsSignalSticker } from '../utils/shareUtils';
+import { CheckCheck, Lock, Smartphone, Film, Loader2 } from 'lucide-react';
+import { shareAsWhatsAppGif, shareAsSignalGif } from '../utils/shareUtils';
 
 interface ChatSimulatorProps {
   gif: GifItem;
@@ -22,13 +22,13 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
   const handleSend = async () => {
     setIsSending(true);
     if (activePlatform === 'whatsapp') {
-      await shareAsWhatsAppSticker(
+      await shareAsWhatsAppGif(
         gif,
         onShowToast,
         onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'whatsapp') : undefined
       );
     } else {
-      await shareAsSignalSticker(
+      await shareAsSignalGif(
         gif,
         onShowToast,
         onOpenDesktopModal ? () => onOpenDesktopModal(gif, 'signal') : undefined
@@ -50,7 +50,7 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <span>WhatsApp Sticker</span>
+            <span>WhatsApp GIF</span>
           </button>
           <button
             onClick={() => setActivePlatform('signal')}
@@ -60,13 +60,13 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
                 : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
-            <span>Signal Sticker</span>
+            <span>Signal GIF</span>
           </button>
         </div>
 
         <span className="text-[11px] text-slate-500 dark:text-slate-400 hidden sm:inline-flex items-center gap-1">
           <Smartphone className="w-3.5 h-3.5" />
-          <span>True Sticker Chat Preview</span>
+          <span>True Animated GIF Chat Preview</span>
         </span>
       </div>
 
@@ -85,20 +85,19 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
           backgroundSize: '16px 16px'
         }}
       >
-        {/* Encryption Banner */}
+        {/* Banner */}
         <div className="self-center mb-3 px-2.5 py-1 rounded-md bg-black/50 text-slate-400 text-[9px] sm:text-[10px] flex items-center gap-1.5 backdrop-blur-xs max-w-xs text-center border border-white/5">
           <Lock className="w-3 h-3 text-amber-400 shrink-0" />
           <span>
             {activePlatform === 'whatsapp'
-              ? 'Sends as true WhatsApp .webp sticker'
-              : 'Sends as true Signal sticker'}
+              ? 'Sends as animated .gif directly to WhatsApp'
+              : 'Sends as animated .gif directly to Signal'}
           </span>
         </div>
 
-        {/* Authentic WhatsApp / Signal Floating Sticker (No enclosing colored card) */}
+        {/* Looping Animated GIF */}
         <div className="self-end flex flex-col items-end">
           <div className="relative group/sticker">
-            {/* The transparent die-cut sticker itself */}
             <div className="relative w-36 sm:w-44 aspect-square flex items-center justify-center p-1">
               <img
                 src={gif.url}
@@ -108,14 +107,15 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
               />
             </div>
 
-            {/* Floating Sticker Timestamp (WhatsApp style) */}
-            <div className="absolute bottom-0 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/60 backdrop-blur-xs text-[9px] text-white/80">
-              <span>{currentTime}</span>
+            {/* GIF Badge & Timestamp */}
+            <div className="absolute bottom-0 right-1 flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-black/70 backdrop-blur-xs text-[9px] text-white/90 font-mono">
+              <span className="font-extrabold text-amber-400">GIF</span>
+              <span>· {currentTime}</span>
               <CheckCheck className="w-3 h-3 text-sky-400" />
             </div>
           </div>
 
-          {/* Dialogue or custom caption shown right below */}
+          {/* Dialogue or custom caption */}
           {(customNote || gif.dialogue) && (
             <div className="mt-1 px-2.5 py-1 rounded-xl bg-[#005c4b] text-white text-[11px] font-medium shadow-xs max-w-xs text-right">
               {customNote || gif.dialogue}
@@ -124,13 +124,13 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
         </div>
       </div>
 
-      {/* Quick Sticker Send Bar */}
+      {/* Quick GIF Send Bar */}
       <div className="p-2 sm:p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <input
           type="text"
           value={customNote}
           onChange={(e) => setCustomNote(e.target.value)}
-          placeholder={`Optional sticker caption for ${activePlatform === 'whatsapp' ? 'WhatsApp' : 'Signal'}...`}
+          placeholder={`Optional caption for ${activePlatform === 'whatsapp' ? 'WhatsApp' : 'Signal'}...`}
           className="flex-1 px-3 py-2 text-xs rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-amber-500 min-w-0"
         />
 
@@ -146,9 +146,9 @@ export const ChatSimulator: React.FC<ChatSimulatorProps> = ({
           {isSending ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
           ) : (
-            <Sticker className="w-3.5 h-3.5" />
+            <Film className="w-3.5 h-3.5" />
           )}
-          <span>Send as {activePlatform === 'whatsapp' ? 'WhatsApp' : 'Signal'} Sticker</span>
+          <span>Send as {activePlatform === 'whatsapp' ? 'WhatsApp' : 'Signal'} GIF</span>
         </button>
       </div>
     </div>
