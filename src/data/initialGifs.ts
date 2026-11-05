@@ -41,7 +41,7 @@ export const INITIAL_GIFS: GifItem[] = [
     category: 'Generic',
     dialogue: 'Wifi band kr do! Padhai likhai pe dhyan do 🚫📶😂',
     tags: ['wifi', 'wifi band kr do', 'funny', 'meme', 'desi', 'study', 'bobble', 'offline', 'internet'],
-    url: '/assets/aistudio/image_9f098507.gif',
+    url: 'https://i.ibb.co/QFsTJQYN/Animated-Wi-Fi-Ban-Sticker-Grid.gif',
     language: 'Hinglish',
     mood: 'Funny',
     source: 'bobble.ai/custom',
